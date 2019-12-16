@@ -1,0 +1,64 @@
+     1                                  ;  Executable name : EATSYSCALL
+     2                                  ;  Version         : 1.0
+     3                                  ;  Created date    : 1/7/2009
+     4                                  ;  Last update     : 2/18/2009
+     5                                  ;  Author          : Jeff Duntemann
+     6                                  ;  Description     : A simple program in assembly for Linux, using NASM 2.05,
+     7                                  ;    demonstrating the use of Linux INT 80H syscalls to display text.
+     8                                  ;
+     9                                  ;  Build using these commands:
+    10                                  ;    nasm -f elf -g -F stabs eatsyscall.asm
+    11                                  ;    ld -o eatsyscall eatsyscall.o
+    12                                  ;
+    13                                  
+    14                                  SECTION .data			; Section containing initialised data
+    15                                  	
+    16 00000000 456174206174204A6F-     	EatMsg: db "Eat at Joe's!",10
+    16 00000009 652773210A         
+    17                                  	EatLen: equ $-EatMsg	
+    18                                  	
+    19                                  SECTION .bss			; Section containing uninitialized data	
+    20                                  
+    21                                  SECTION .text			; Section containing code
+    22                                  
+    23                                  global 	_start			; Linker needs this to find the entry point!
+    24                                  	
+    25                                  _start:
+    26 00000000 90                      	nop			; This no-op keeps gdb happy...
+    27 00000001 B804000000              	mov eax,4		; Specify sys_write call
+    28 00000006 BB01000000              	mov ebx,1		; Specify File Descriptor 1: Standard Output
+    29 0000000B B9[00000000]            	mov ecx,EatMsg		; Pass offset of the message
+    30 00000010 BA0E000000              	mov edx,EatLen		; Pass the length of the message
+    31 00000015 CD80                    	int 80H			; Make kernel call
+    32                                  
+    33 00000017 B801000000              	MOV eax,1		; Code for Exit Syscall
+    34 0000001C BB00000000              	mov ebx,0		; Return a code of zero	
+    35 00000021 CD80                    	int 80H			; Make kernel call
+    36                                  
+    37                                  
+    38                                  
+    39                                  
+    40                                  
+    41                                  
+    42                                  
+    43                                  
+    44                                  
+    45                                  
+    46                                  
+    47                                  
+    48                                  
+    49                                  
+    50                                  
+    51                                  
+    52                                  
+    53                                  
+    54                                  
+    55                                  
+    56                                  
+    57                                  
+    58                                  
+    59                                  
+    60                                  
+    61                                  
+    62                                  
+    63                                  

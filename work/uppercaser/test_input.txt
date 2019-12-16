@@ -1,0 +1,4 @@
+Some of these
+are already UPPERCASED
+and we DO NOT want to do
+anything with those.

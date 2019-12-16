@@ -1,0 +1,50 @@
+     1                                  section .bss
+     2                                      BUFFLEN equ 1024
+     3 00000000 <res 00000400>              Buff resb BUFFLEN
+     4                                  
+     5                                  section .data
+     6                                      
+     7                                  section .text
+     8                                      global _start
+     9                                      
+    10                                  _start:
+    11 00000000 90                          nop
+    12                                      
+    13                                  Read:
+    14 00000001 B803000000                  mov eax,3
+    15 00000006 BB00000000                  mov ebx,0
+    16 0000000B B9[00000000]                mov ecx,Buff
+    17 00000010 BA00040000                  mov edx,BUFFLEN
+    18 00000015 CD80                        int 80h
+    19                                      ; the book does mov esi,eax here for some reason, gonna keep it but i'm not seeing the point rn
+    20 00000017 89C6                        mov esi,eax
+    21                                      
+    22 00000019 83F800                      cmp eax,0 ; eax has the amount of read bytes
+    23 0000001C 7436                        je Exit
+    24                                      
+    25 0000001E 89F1                        mov ecx,esi
+    26 00000020 BD[00000000]                mov ebp,Buff ; we're going to be running through the buffer, gotta save the address in a reg
+    27 00000025 4D                          dec ebp ; prevent off-by-one when adding the # of bytes read
+    28                                  Scan:
+    29 00000026 807C0D0061                  cmp byte [ebp+ecx],61h
+    30 0000002B 720C                        jb Next
+    31                                      
+    32 0000002D 807C0D007A                  cmp byte [ebp+ecx],7Ah
+    33 00000032 7705                        ja Next
+    34                                      
+    35 00000034 806C0D0020                  sub byte [ebp+ecx],20h
+    36                                  Next:
+    37 00000039 49                          dec ecx
+    38 0000003A 75EA                        jnz Scan
+    39                                  Write:
+    40 0000003C B804000000                  mov eax,4
+    41 00000041 BB01000000                  mov ebx,1
+    42 00000046 B9[00000000]                mov ecx,Buff
+    43 0000004B BA00040000                  mov edx,BUFFLEN
+    44 00000050 CD80                        int 80h
+    45                                      
+    46 00000052 EBAD                        jmp Read
+    47                                  Exit:
+    48 00000054 B801000000                  mov eax,1
+    49 00000059 BB00000000                  mov ebx,0
+    50 0000005E CD80                        int 80h

@@ -1,0 +1,16 @@
+     1                                  section .data
+     2                                  section .text
+     3                                      
+     4                                  global _start
+     5                                  
+     6                                  _start:
+     7 00000000 90                          nop
+     8                                      
+     9                                      ; stuff goes between the two nops
+    10 00000001 B001                        mov al,01h
+    11 00000003 B400                        mov ah,0h
+    12 00000005 B300                        mov bl,0h
+    13 00000007 F6F3                        div bl
+    14 00000009 90                          nop
+    15                                      
+    16                                  section .bss
