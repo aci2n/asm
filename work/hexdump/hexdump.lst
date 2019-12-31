@@ -1,0 +1,86 @@
+     1                                  section .bss
+     2                                      BUFFLEN equ 16
+     3 00000000 <res 00000010>              Buff: resb BUFFLEN
+     4                                      
+     5                                  section .data
+     6 00000000 203030203030203030-         HexStr: db " 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",10
+     6 00000009 203030203030203030-
+     6 00000012 203030203030203030-
+     6 0000001B 203030203030203030-
+     6 00000024 203030203030203030-
+     6 0000002D 2030300A           
+     7                                      HEXLEN equ $-HexStr
+     8                                      
+     9 00000031 303132333435363738-         Digits: db "0123456789ABCDEF"
+     9 0000003A 39414243444546     
+    10                                  
+    11                                  section .text
+    12                                  
+    13                                  global _start
+    14                                  
+    15                                  _start:
+    16 00000000 90                          nop
+    17                                      
+    18                                  Read:
+    19 00000001 B803000000                  mov eax,3 ; sys_read syscall
+    20 00000006 BB00000000                  mov ebx,0 ; stdin
+    21 0000000B B9[00000000]                mov ecx,Buff
+    22 00000010 BA10000000                  mov edx,BUFFLEN
+    23 00000015 CD80                        int 80h
+    24                                      
+    25                                      ; eof?
+    26 00000017 83F800                      cmp eax,0
+    27 0000001A 744C                        je End
+    28                                      
+    29                                      ; save number of bytes read this time
+    30 0000001C 89C5                        mov ebp,eax
+    31                                      
+    32                                      ; reset counter (goes from 0 to what's held in ebp)
+    33 0000001E 31C9                        xor ecx,ecx
+    34                                      
+    35                                  Scan:
+    36                                      ; clear eax (we are going to move to al so we need everything else in 0)
+    37 00000020 31C0                        xor eax,eax
+    38                                      
+    39                                      ; read current position in buffer to al
+    40 00000022 8A81[00000000]              mov al,byte [Buff+ecx]
+    41                                      ; clone to ebx, we are gonna get the second nybble from there
+    42 00000028 89C3                        mov ebx,eax
+    43                                      
+    44                                      ; keep only first nybbles in al and bl
+    45 0000002A 240F                        and al,0Fh
+    46 0000002C C0EB04                      shr bl,4
+    47                                      
+    48                                      ; multiply by 3: edx ends up being 3*ecx
+    49 0000002F 89CA                        mov edx,ecx
+    50 00000031 D1E2                        shl edx,1
+    51 00000033 01CA                        add edx,ecx
+    52                                      
+    53                                      ; edx has the offset into HexStr: edx+1 for the higher nybble and edx+2 for the lower one
+    54                                      ; we can use ax and bx to keep the digits (since we can't move from memory to memory)
+    55 00000035 8A80[31000000]              mov al,byte [Digits+eax]
+    56 0000003B 8882[02000000]              mov [HexStr+edx+2],al
+    57                                      
+    58 00000041 8A9B[31000000]              mov bl,byte [Digits+ebx]
+    59 00000047 889A[01000000]              mov [HexStr+edx+1],bl
+    60                                      
+    61                                      ; increment the counter, and if it's still less than ebp we keep scanning
+    62 0000004D 41                          inc ecx
+    63 0000004E 39E9                        cmp ecx,ebp
+    64 00000050 76CE                        jna Scan
+    65                                      
+    66                                      ; if we're done scanning the buffer, write it to stdout and try to get the next chunk from the file
+    67 00000052 B804000000                  mov eax,4 ; sys_write
+    68 00000057 BB01000000                  mov ebx,1 ; stdout
+    69 0000005C B9[00000000]                mov ecx,HexStr
+    70 00000061 83C203                      add edx,3
+    71 00000064 CD80                        int 80h
+    72                                      
+    73 00000066 EB99                        jmp Read
+    74                                      
+    75                                  End:
+    76 00000068 B801000000                  mov eax,1 ; exit syscall
+    77 0000006D BB00000000                  mov ebx,0 ; return code
+    78 00000072 CD80                        int 80h
+    79                                      
+    80 00000074 90                          nop

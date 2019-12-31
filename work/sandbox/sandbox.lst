@@ -8,9 +8,7 @@
      8                                      
      9                                      ; stuff goes between the two nops
     10 00000001 B001                        mov al,01h
-    11 00000003 B400                        mov ah,0h
-    12 00000005 B300                        mov bl,0h
-    13 00000007 F6F3                        div bl
-    14 00000009 90                          nop
-    15                                      
-    16                                  section .bss
+    11 00000003 D0E0                        shl al,1
+    12 00000005 90                          nop
+    13                                      
+    14                                  section .bss

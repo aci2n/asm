@@ -8,9 +8,7 @@ _start:
     
     ; stuff goes between the two nops
     mov al,01h
-    mov ah,0h
-    mov bl,0h
-    div bl
+    shl al,1
     nop
     
 section .bss
