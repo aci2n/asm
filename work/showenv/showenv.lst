@@ -1,0 +1,66 @@
+     1                                  section .bss
+     2                                  
+     3                                  section .data
+     4 00000000 536F6D657468696E67-         ErrMsg: db "Something went wrong :(",10
+     4 00000009 2077656E742077726F-
+     4 00000012 6E67203A280A       
+     5                                      ERRLEN equ $-ErrMsg
+     6 00000018 0A                          EOL: db 10
+     7                                  
+     8                                  section .text
+     9                                  
+    10                                  global _start
+    11                                  extern WriteStdout, WriteStderr
+    12                                  
+    13                                  _start:
+    14 00000000 90                          nop
+    15                                      
+    16                                      ; save address of first env var in ebp
+    17 00000001 89E5                        mov ebp,esp
+    18                                      
+    19                                      ; ebx is going to hold the doubleword-size offset from the top of the stack
+    20                                      ; the offset to the first env var is
+    21                                      ;  - dword[ebp]: the arg count held at the top of the stack 
+    22                                      ;  - 2: the arg count itself and the null pointer between the args and the env vars
+    23 00000003 8B5D00                      mov ebx,dword[ebp]
+    24 00000006 83C302                      add ebx,2
+    25                                      
+    26                                      ; prepare for repne scasb (only needed once)
+    27 00000009 FC                          cld
+    28 0000000A 31C0                        xor eax,eax ; we are going to look for a null in the env var strings
+    29                                  .Next:
+    30 0000000C 8B749D00                    mov esi,dword[ebp+ebx*4] ; keep the address to the env var in esi
+    31 00000010 83FE00                      cmp esi,0 ; check if we found the null pointer
+    32 00000013 743A                        je .End ; finish if we found the null pointer
+    33                                      
+    34 00000015 89F7                        mov edi,esi ; copy the address to edi (setup for scasb)
+    35 00000017 B9FFFF0000                  mov ecx,0FFFFh ; set a cap on how many chars we are going to check with repne
+    36 0000001C F2AE                        repne scasb ; increase edi and decrease ecx until ecx is 0 or [edi] equals eax (0)
+    37 0000001E 7520                        jnz .Error ; if we found a 0 in the string, ZF should have been set to 1
+    38                                      
+    39 00000020 29F7                        sub edi,esi ; calculate the env var string length
+    40 00000022 83EF01                      sub edi,1 ; ignore the 0 at the end of the string (we are gonna print an EOL later)
+    41                                      
+    42                                      ; write string and EOL
+    43 00000025 89F1                        mov ecx,esi
+    44 00000027 89FA                        mov edx,edi
+    45 00000029 E8(00000000)                call WriteStdout
+    46 0000002E B9[18000000]                mov ecx,EOL
+    47 00000033 BA01000000                  mov edx,1
+    48 00000038 E8(00000000)                call WriteStdout
+    49                                      
+    50                                      ; increase the offset into the stack
+    51 0000003D 43                          inc ebx
+    52 0000003E EBCC                        jmp .Next
+    53                                  
+    54                                  .Error:
+    55 00000040 B9[00000000]                mov ecx,ErrMsg
+    56 00000045 BA18000000                  mov edx,ERRLEN
+    57 0000004A E8(00000000)                call WriteStderr
+    58                                      
+    59                                  .End:
+    60 0000004F B801000000                  mov eax,1
+    61 00000054 BB00000000                  mov ebx,0
+    62 00000059 CD80                        int 80h
+    63                                      
+    64 0000005B 90                          nop

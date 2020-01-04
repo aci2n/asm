@@ -1,14 +1,28 @@
      1                                  section .data
-     2                                  section .text
-     3                                      
-     4                                  global _start
-     5                                  
-     6                                  _start:
-     7 00000000 90                          nop
-     8                                      
-     9                                      ; stuff goes between the two nops
-    10 00000001 B001                        mov al,01h
-    11 00000003 D0E0                        shl al,1
-    12 00000005 90                          nop
-    13                                      
-    14                                  section .bss
+     2 00000000 616263646566676869-         EditBuff: db 'abcdefghijklm        '
+     2 00000009 6A6B6C6D2020202020-
+     2 00000012 202020             
+     3                                      ENDPOS equ 12
+     4                                      INSERTPOS equ 5
+     5                                      
+     6                                  section .text
+     7                                      
+     8                                  global _start
+     9                                  
+    10                                  _start:
+    11 00000000 90                          nop
+    12                                      
+    13                                      ; stuff goes between the two nops
+    14 00000001 BB[05000000]                mov ebx,EditBuff+INSERTPOS
+    15                                      
+    16 00000006 FD                          std
+    17 00000007 BE[0C000000]                mov esi,EditBuff+ENDPOS
+    18 0000000C BF[0D000000]                mov edi,EditBuff+ENDPOS+1
+    19 00000011 B908000000                  mov ecx,ENDPOS-INSERTPOS+1
+    20 00000016 F3A4                        rep movsb
+    21                                      
+    22 00000018 C60358                      mov byte[ebx],'X'
+    23                                      
+    24 0000001B 90                          nop
+    25                                      
+    26                                  section .bss

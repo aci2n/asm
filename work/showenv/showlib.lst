@@ -1,0 +1,46 @@
+     1                                  section .bss
+     2                                  
+     3                                  section .data
+     4                                  
+     5                                  section .text
+     6                                  
+     7                                  global WriteStdout, WriteStderr
+     8                                  
+     9                                  ; %1: output file
+    10                                  %macro Write 1 
+    11                                      push eax
+    12                                      push ebx
+    13                                      mov eax,4
+    14                                      mov ebx,%1
+    15                                      int 80h
+    16                                      pop ebx
+    17                                      pop eax
+    18                                  %endmacro
+    19                                  
+    20                                  ; IN:
+    21                                  ;  ecx: buffer address
+    22                                  ;  edx: buffer length
+    23                                  WriteStdout:
+    24                                      Write 1
+    24 00000000 50                  <1>  push eax
+    24 00000001 53                  <1>  push ebx
+    24 00000002 B804000000          <1>  mov eax,4
+    24 00000007 BB01000000          <1>  mov ebx,%1
+    24 0000000C CD80                <1>  int 80h
+    24 0000000E 5B                  <1>  pop ebx
+    24 0000000F 58                  <1>  pop eax
+    25 00000010 C3                          ret
+    26                                      
+    27                                  ; IN:
+    28                                  ;  ecx: buffer address
+    29                                  ;  edx: buffer length
+    30                                  WriteStderr:
+    31                                      Write 2
+    31 00000011 50                  <1>  push eax
+    31 00000012 53                  <1>  push ebx
+    31 00000013 B804000000          <1>  mov eax,4
+    31 00000018 BB02000000          <1>  mov ebx,%1
+    31 0000001D CD80                <1>  int 80h
+    31 0000001F 5B                  <1>  pop ebx
+    31 00000020 58                  <1>  pop eax
+    32 00000021 C3                          ret

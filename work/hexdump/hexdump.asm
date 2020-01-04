@@ -53,10 +53,10 @@ Scan:
     ; edx has the offset into HexStr: edx+1 for the higher nybble and edx+2 for the lower one
     ; we can use ax and bx to keep the digits (since we can't move from memory to memory)
     mov al,byte [Digits+eax]
-    mov [HexStr+edx+2],al
+    mov byte [HexStr+edx+2],al
     
     mov bl,byte [Digits+ebx]
-    mov [HexStr+edx+1],bl
+    mov byte [HexStr+edx+1],bl
     
     ; increment the counter, and if it's still less than ebp we keep scanning
     inc ecx

@@ -67,20 +67,21 @@
     61                                      ; increment the counter, and if it's still less than ebp we keep scanning
     62 0000004D 41                          inc ecx
     63 0000004E 39E9                        cmp ecx,ebp
-    64 00000050 76CE                        jna Scan
-    65                                      
-    66                                      ; if we're done scanning the buffer, write it to stdout and try to get the next chunk from the file
-    67 00000052 B804000000                  mov eax,4 ; sys_write
-    68 00000057 BB01000000                  mov ebx,1 ; stdout
-    69 0000005C B9[00000000]                mov ecx,HexStr
-    70 00000061 83C203                      add edx,3
-    71 00000064 CD80                        int 80h
-    72                                      
-    73 00000066 EB99                        jmp Read
-    74                                      
-    75                                  End:
-    76 00000068 B801000000                  mov eax,1 ; exit syscall
-    77 0000006D BB00000000                  mov ebx,0 ; return code
-    78 00000072 CD80                        int 80h
-    79                                      
-    80 00000074 90                          nop
+    64                                      ; book uses jna but that would overflow afaik (would go from 0 to 16 instead of 15)
+    65 00000050 72CE                        jb Scan
+    66                                      
+    67                                      ; if we're done scanning the buffer, write it to stdout and try to get the next chunk from the file
+    68 00000052 B804000000                  mov eax,4 ; sys_write
+    69 00000057 BB01000000                  mov ebx,1 ; stdout
+    70 0000005C B9[00000000]                mov ecx,HexStr
+    71 00000061 83C203                      add edx,3
+    72 00000064 CD80                        int 80h
+    73                                      
+    74 00000066 EB99                        jmp Read
+    75                                      
+    76                                  End:
+    77 00000068 B801000000                  mov eax,1 ; exit syscall
+    78 0000006D BB00000000                  mov ebx,0 ; return code
+    79 00000072 CD80                        int 80h
+    80                                      
+    81 00000074 90                          nop

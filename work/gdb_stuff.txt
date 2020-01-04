@@ -1,0 +1,8 @@
+gdb executes instructions from ~/.gdbinit on start
+  can do something like "set disassembly-flavor intel" to have that as "default"
+
+"i r" shows state of registers
+"disas" disassmebles current procedure and shows position
+"run {executable} < {file}" to test redirection
+"si" steps a instruction
+
