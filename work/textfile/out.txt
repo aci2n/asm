@@ -1,0 +1,12 @@
+1: textfile.asm
+2: 
+3: This program takes an [inputfile] as its only argument and
+4: generates a new file with a line number at the beginning
+5: of each line of the input file.
+6: 
+7: How to use this program:
+8: 	- Execute from the command line: ./textfile [inputfile]
+9: 	- Enter the output filename
+10: 	- Press enter
+11: 
+12: This is a long line whose only purpose is test how the output will behave when it takes a line with13:  length over the buffer size which is 100 (this line is 175 characters long)
